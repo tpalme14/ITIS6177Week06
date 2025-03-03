@@ -2,6 +2,7 @@ const express = require('express');
 const { body, param, validationResult } = require('express-validator');
 const app = express();
 const port = 3000;
+const axios = require('axios');
 
 const mariadb = require('mariadb');
 const pool = mariadb.createPool({
@@ -12,6 +13,21 @@ const pool = mariadb.createPool({
 	port: 3306,
 	connectionLimit: 5
 });
+
+//my-function
+app.get('/say', async (req, res) => {
+    const keyword = req.query.keyword;
+    try {
+        const response = await axios.get('https://myfunctionitis6177.azurewebsites.net/api/HttpTriggerFunction?', {
+            params: { keyword }
+        });
+        res.send(response.data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error forwarding request to function');
+    }
+});
+
 
 const { swaggerUi, specs } = require('./swagger');
 
